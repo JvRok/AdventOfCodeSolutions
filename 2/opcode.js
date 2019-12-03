@@ -1,29 +1,68 @@
 var fs = require("fs");
 
-function splitArray(input) {
+//Dont touch
+function splitData(data) {
+  return data.toString().split(",");
+}
+
+//Convert to int as promise
+function convertToInt(array) {
   return new Promise(function(resolve, reject) {
-    input.on("data", function(data) {
-      resolve(data.toString().split(","));
-    });
+    for (i in array) {
+      array[i] = parseInt(array[i], 10);
+    }
+    resolve(array);
   });
 }
 
-function doCalculations(array) {
-  for (i = 0; i < array.length; i = i + 4) {
-    var operator = array[i];
-    if ((operator = 99)) {
-      return;
-    }
-    console.log(array[i]);
-  }
+//Dont touch
+function splitArray(input) {
+  return new Promise(function(resolve, reject) {
+    input.on("data", function(data) {
+      resolve(splitData(data));
+    });
+  });
+}
+function doAddition(array, index) {
+  var array2 = array;
+  return new Promise(function(resolve, reject) {
+    array2[array[index + 3]] =
+      array[array[index + 1]] + array[array[index + 2]];
+    resolve(array2);
+  });
 }
 
-var input = fs.createReadStream("opcode2.txt");
+function doMultiplication(array, index) {
+  var array2 = array;
+  return new Promise(function(resolve, reject) {
+    array2[array[index + 3]] =
+      array[array[index + 1]] * array[array[index + 2]];
+    resolve(array2);
+  });
+}
 
-var opcodeArray = splitArray(input);
+async function parseArray(array) {
+  var theMutableArray = array;
+  for (i = 0; i < theMutableArray.length - 3; i = i + 4) {
+    var operator = theMutableArray[i];
+    //console.log(operator);
+    if (parseInt(operator) === 1) {
+      theMutableArray = await doAddition(theMutableArray, i);
+    } else if (parseInt(operator) === 2) {
+      theMutableArray = await doMultiplication(theMutableArray, i);
+    }
+  }
+  console.log(JSON.stringify(theMutableArray));
+}
 
-opcodeArray.then(function(value) {
-  console.log(value);
-});
+async function main() {
+  var input = fs.createReadStream("opcode.txt");
+  var opcodeArray = await splitArray(input);
+  console.log(JSON.stringify(opcodeArray));
+  opcodeArray = await convertToInt(opcodeArray);
+  console.log(JSON.stringify(opcodeArray));
+  //Works up to here
+  var blah = parseArray(opcodeArray);
+}
 
-doCalculations(opcodeArray);
+main();
