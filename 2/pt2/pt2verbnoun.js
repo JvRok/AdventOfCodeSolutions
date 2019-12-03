@@ -52,15 +52,45 @@ async function parseArray(array) {
       theMutableArray = await doMultiplication(theMutableArray, i);
     }
   }
-  console.log(JSON.stringify(theMutableArray));
+  if (theMutableArray[0] === 19690720) {
+    console.log(
+      "The verb is: " +
+        theMutableArray[1] +
+        ". The noun is: " +
+        theMutableArray[2] +
+        "."
+    );
+    var answer = 100 * theMutableArray[1] + theMutableArray[2];
+
+    console.log("The answer to the question 100*noun+verb = " + answer);
+  }
+}
+
+async function replaceVerbNoun(i, x, opcodeArray) {
+  var newArray = [...opcodeArray];
+  return new Promise(function(resolve, reject) {
+    newArray[1] = i;
+    newArray[2] = x;
+    resolve(newArray);
+  });
 }
 
 async function main() {
   var input = fs.createReadStream("opcode.txt");
   var opcodeArray = await splitArray(input);
+  //console.log(JSON.stringify(opcodeArray));
   opcodeArray = await convertToInt(opcodeArray);
+  //console.log(JSON.stringify(opcodeArray));
+
+  for (var i = 0; i < 100; i++) {
+    for (var x = 0; x < 100; x++) {
+      var array = await replaceVerbNoun(i, x, opcodeArray);
+      //console.log(JSON.stringify(array));
+      await parseArray(array);
+    }
+  }
+
   //Works up to here
-  var blah = parseArray(opcodeArray);
 }
 
 main();
