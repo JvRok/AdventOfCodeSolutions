@@ -43,15 +43,17 @@ async function main() {
   var value = 0;
   var repeatVal;
   var map = new Map();
-  for (i = 0; i < splitNewLines.length; i++) {
-    value = await doCalc(
-      splitNewLines[i].substring(0, 1),
-      splitNewLines[i].substring(1, splitNewLines[i].length),
-      value
-    );
-    console.log(value, map, repeatVal);
-    repeatVal = await checkIfRepeat(value, map, repeatVal);
-    console.log(repeatVal);
+  while (repeatVal === undefined) {
+    for (i = 0; i < splitNewLines.length; i++) {
+      value = await doCalc(
+        splitNewLines[i].substring(0, 1),
+        splitNewLines[i].substring(1, splitNewLines[i].length),
+        value
+      );
+      //console.log(value, map, repeatVal);
+      repeatVal = await checkIfRepeat(value, map, repeatVal);
+      //console.log(repeatVal);
+    }
   }
   console.log(value);
   console.log("First repeat is: " + repeatVal);
