@@ -26,6 +26,7 @@ function splitArray(input) {
 function doAddition(array, index) {
   var array2 = array;
   return new Promise(function(resolve, reject) {
+    console.log("doAdd Index: " + index);
     array2[array[index + 3]] =
       array[array[index + 1]] + array[array[index + 2]];
     var newIndex = index + 4;
@@ -84,8 +85,10 @@ async function parseArray(array) {
         i,
         operator.modes
       );
+
       theMutableArray = arr;
       i = newIndex;
+      console.log(theMutableArray, i);
     } else if (parseInt(operator.opcode) === 2) {
       var { arr, newIndex } = await doMultiplication(
         theMutableArray,
