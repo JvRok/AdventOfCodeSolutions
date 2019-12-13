@@ -278,12 +278,11 @@ async function parseArray(array, inputVal) {
 }
 
 async function main() {
-  var input = fs.createReadStream("input22.txt");
+  var input = fs.createReadStream("input.txt");
   var inputVal = 5;
   var opcodeArray = await splitArray(input);
   opcodeArray = await convertToInt(opcodeArray);
-  //Works up to here
-  var blah = parseArray(opcodeArray, inputVal);
+  parseArray(opcodeArray, inputVal);
 }
 
 main();
