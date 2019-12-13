@@ -38,7 +38,7 @@ function checkIfRepeat(value, map, repeat) {
 }
 
 async function main() {
-  var input = fs.createReadStream("input.txt");
+  var input = fs.createReadStream("testinput.txt");
   var splitNewLines = await splitNLToArray(input);
   var value = 0;
   var repeatVal;
