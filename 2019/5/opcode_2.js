@@ -35,12 +35,11 @@ function getOpCode(opcode) {
 }
 
 function getVals(array, index, a, b, c) {
-  //console.log("a ", a, " b ", b, " c ", c);
   return new Promise(function(resolve, reject) {
     if (parseInt(a) === 1) {
-      var p1 = array[index + 1];
+      var p3 = array[index + 3];
     } else {
-      var p1 = array[array[index + 1]];
+      var p3 = array[index + 3];
     }
     if (parseInt(b) === 1) {
       var p2 = array[index + 2];
@@ -49,9 +48,9 @@ function getVals(array, index, a, b, c) {
     }
 
     if (parseInt(c) === 1) {
-      var p3 = array[index + 3];
+      var p1 = array[index + 1];
     } else {
-      var p3 = array[index + 3];
+      var p1 = array[array[index + 1]];
     }
     resolve({ p1: p1, p2: p2, p3: p3 });
   });
@@ -62,10 +61,7 @@ async function doAddition(array, index, opcodes) {
   var a = await getOpCode(opcodes.a);
   var b = await getOpCode(opcodes.b);
   var c = await getOpCode(opcodes.c);
-  //console.log("add a opcode: ", a, " b opcode: ", b, " c opcode: ", c);
-
   var { p1, p2, p3 } = await getVals(array, index, a, b, c);
-  //console.log("add p1: ", p1, " p2: ", p2, " p3: ", p3);
   return new Promise(function(resolve, reject) {
     array2[p3] = p1 + p2;
     resolve({ arr: array2, newIndex: newIndex });
@@ -75,14 +71,10 @@ async function doAddition(array, index, opcodes) {
 async function doMultiplication(array, index, opcodes) {
   var array2 = array;
   var newIndex = index + 4;
-  //console.log("m", opcodes);
   var a = await getOpCode(opcodes.a);
   var b = await getOpCode(opcodes.b);
   var c = await getOpCode(opcodes.c);
-  //console.log("m a opcode: ", a, " b opcode: ", b, " c opcode: ", c);
   var { p1, p2, p3 } = await getVals(array, index, a, b, c);
-  //console.log("m p1: ", p1, " p2: ", p2, " p3: ", p3);
-
   return new Promise(function(resolve, reject) {
     array2[p3] = p1 * p2;
     resolve({ arr: array2, newIndex: newIndex });
@@ -96,11 +88,7 @@ async function saveToAddress(array, index, opcodes, inputVal) {
   var a = await getOpCode(opcodes.a);
   var b = await getOpCode(opcodes.b);
   var c = await getOpCode(opcodes.c);
-  //console.log("sta a opcode: ", a, " b opcode: ", b, " c opcode: ", c);
-
   var { p1 } = await getVals(array, index, 1, 1, 1);
-  //console.log("p1 is all that matters: ", p1, " index is: " + index);
-
   return new Promise(function(resolve, reject) {
     array2[p1] = inputVal;
     resolve({ arr: array2, newIndex: newIndex });
@@ -109,13 +97,61 @@ async function saveToAddress(array, index, opcodes, inputVal) {
 
 async function outputVal(array, index, opcodes) {
   var c = await getOpCode(opcodes.c);
-  //console.log("c opcode: ", c);
   var { p1, p2, p3 } = await getVals(array, index, c, c, c);
-  //console.log("p1: ", p1, " p2: ", p2, " p3: ", p3);
   return new Promise(function(resolve, reject) {
-    console.log("Output param is: " + p1);
     var newIndex = index + 2;
     resolve({ arr: array, newIndex: newIndex });
+  });
+}
+
+async function jumpIfEq(array, index, opcodes, eq) {
+  var a = await getOpCode(opcodes.a);
+  var b = await getOpCode(opcodes.b);
+  var c = await getOpCode(opcodes.c);
+
+  var { p1, p2 } = await getVals(array, index, a, b, c);
+  return new Promise(function(resolve, reject) {
+    if ((p1 !== 0) === eq) {
+      var newIndex = p2;
+    } else {
+      var newIndex = index + 3;
+    }
+    resolve({ arr: array, newIndex: newIndex });
+  });
+}
+
+async function storeIfLessThan(array, index, opcodes) {
+  var array2 = array;
+  var newIndex = index + 4;
+  var a = await getOpCode(opcodes.a);
+  var b = await getOpCode(opcodes.b);
+  var c = await getOpCode(opcodes.c);
+  var { p1, p2, p3 } = await getVals(array, index, a, b, c);
+  return new Promise(function(resolve, reject) {
+    if (p1 < p2) {
+      array2[p3] = 1;
+    } else {
+      array2[p3] = 0;
+    }
+    resolve({ arr: array2, newIndex: newIndex });
+  });
+}
+
+async function storeIfEquals(array, index, opcodes) {
+  var array2 = array;
+  var newIndex = index + 4;
+
+  var a = await getOpCode(opcodes.a);
+  var b = await getOpCode(opcodes.b);
+  var c = await getOpCode(opcodes.c);
+  var { p1, p2, p3 } = await getVals(array, index, a, b, c);
+  return new Promise(function(resolve, reject) {
+    if (p1 === p2) {
+      array2[p3] = 1;
+    } else {
+      array2[p3] = 0;
+    }
+    resolve({ arr: array2, newIndex: newIndex });
   });
 }
 
@@ -150,7 +186,6 @@ async function parseArray(array, inputVal) {
   var theMutableArray = array;
   var i = 0;
   while (i < theMutableArray.length) {
-    //console.log(theMutableArray);
     var operator = await returnModesAndOpcode(theMutableArray[i]);
     if (parseInt(operator.opcode) === 1) {
       var { arr, newIndex } = await doAddition(
@@ -185,8 +220,42 @@ async function parseArray(array, inputVal) {
       );
       theMutableArray = arr;
       i = newIndex;
+    } else if (parseInt(operator.opcode) === 5) {
+      var { arr, newIndex } = await jumpIfEq(
+        theMutableArray,
+        i,
+        operator.modes,
+        true
+      );
+      theMutableArray = arr;
+      i = newIndex;
+    } else if (parseInt(operator.opcode) === 6) {
+      var { arr, newIndex } = await jumpIfEq(
+        theMutableArray,
+        i,
+        operator.modes,
+        false
+      );
+      theMutableArray = arr;
+      i = newIndex;
+    } else if (parseInt(operator.opcode) === 7) {
+      var { arr, newIndex } = await storeIfLessThan(
+        theMutableArray,
+        i,
+        operator.modes
+      );
+      theMutableArray = arr;
+      i = newIndex;
+    } else if (parseInt(operator.opcode) === 8) {
+      var { arr, newIndex } = await storeIfEquals(
+        theMutableArray,
+        i,
+        operator.modes
+      );
+      theMutableArray = arr;
+      i = newIndex;
     } else if (parseInt(operator.opcode) === 99) {
-      console.log(theMutableArray);
+      console.log("Test program finished");
       return;
     } else {
       console.log(
@@ -200,8 +269,8 @@ async function parseArray(array, inputVal) {
         " ",
         theMutableArray[i + 2],
         " ",
-        theMutableArray[i + 3]
-        //theMutableArray
+        theMutableArray[i + 3],
+        theMutableArray
       );
       return;
     }
@@ -210,7 +279,7 @@ async function parseArray(array, inputVal) {
 
 async function main() {
   var input = fs.createReadStream("input22.txt");
-  var inputVal = 1;
+  var inputVal = 5;
   var opcodeArray = await splitArray(input);
   opcodeArray = await convertToInt(opcodeArray);
   //Works up to here
