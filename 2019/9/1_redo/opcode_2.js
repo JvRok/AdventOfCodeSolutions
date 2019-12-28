@@ -88,6 +88,38 @@ function computeIt(oa, ind, iv) {
         console.log("Outputting: ", oa[i1]);
         resolve({oa: oa, ind: ind+2});
         break;
+      case 5:
+        if(oa[i1] !== 0) {
+          resolve({oa: oa, ind: oa[i2]})
+        } else {
+          resolve({oa: oa, ind: ind+3})
+        }
+        break;
+      case 6:
+        if(oa[i1] === 0) {
+          resolve({oa: oa, ind: oa[i2]})
+        } else {
+          resolve({oa: oa, ind: ind+3})
+        }
+        break;
+      case 7:
+        if(oa[i1] < oa[i2]) {
+          oa[i3] = 1;
+          resolve({oa: oa, ind: ind+4})
+        } else {
+          oa[i3] = 0;
+          resolve({oa: oa, ind: ind+4})
+        }
+        break;
+      case 8:
+        if(oa[i1] === oa[i2]) {
+          oa[i3] = 1;
+          resolve({oa: oa, ind: ind+4})
+        } else {
+          oa[i3] = 0;
+          resolve({oa: oa, ind: ind+4})
+        }
+        break;
       default:
         console.log("Shouldn't have reached here, index is: ", ind, " and current opcode is: ", inst);
         resolve({oa: oa, ind: ind+4});
@@ -107,7 +139,7 @@ async function parseArray(oa, iv) {
 async function main() {
 
   var input = fs.createReadStream("5_1_input.txt");
-  var inputVal = 1;
+  var inputVal = 5;
 
   var oa = await splitArray(input);
   oa = await convertToInt(oa);
