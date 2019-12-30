@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "draftlog": "^1.0.12",
     "mathjs": "^6.2.5",
     "multikeymap": "^1.0.0"
   }
