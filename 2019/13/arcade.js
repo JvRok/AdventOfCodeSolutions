@@ -149,13 +149,13 @@ function drawImage() {
       if(gameMap[x][y] === undefined || gameMap[x][y] === 0) {
         newLines = newLines+' ';
       } else if(gameMap[x][y] === 1) {
-        newLines = newLines + figures.square;
+        newLines = newLines + "#";
       } else if(gameMap[x][y] === 2) {
-        newLines = newLines + figures.cross;
+        newLines = newLines + "B";
       } else if(gameMap[x][y] === 3) {
-        newLines = newLines + figures.mustache;
+        newLines = newLines + 'M';
       } else if(gameMap[x][y] === 4) {
-        newLines = newLines + figures.smiley;
+        newLines = newLines + "O";
       }
     }
     newLines = newLines + '\n';
@@ -183,7 +183,7 @@ function computeIt(oa, ind, rb, outarr) {
         break; 
       case 3:
         drawImage();
-        //await sleep(10);
+        await sleep(500);
         oa[i1] = getInputVal();
         resolve({oa: oa, ind: ind+2, rb: rb});
         break;
