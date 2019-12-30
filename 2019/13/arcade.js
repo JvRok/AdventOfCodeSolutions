@@ -1,20 +1,19 @@
 var fs = require("fs");
-
 require('draftlog').into(console)
+const figures = require('figures');
 
 var gameMap = [];
 var cols = 37;
 var val1 = undefined, val2 = undefined, val3 = undefined;
 var score = 0;
 var line = "";
-
 var update = console.draft(line);
+var blockCount = 0;
 
 //init the grid matrix
 for ( var i = 0; i < cols; i++ ) {
   gameMap[i] = []; 
 }
-
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -149,8 +148,14 @@ function drawImage() {
     for(var x = 0; x < gameMap.length; x++) {
       if(gameMap[x][y] === undefined || gameMap[x][y] === 0) {
         newLines = newLines+' ';
-      } else {
-        newLines = newLines + gameMap[x][y].toString()
+      } else if(gameMap[x][y] === 1) {
+        newLines = newLines + figures.square;
+      } else if(gameMap[x][y] === 2) {
+        newLines = newLines + figures.cross;
+      } else if(gameMap[x][y] === 3) {
+        newLines = newLines + figures.mustache;
+      } else if(gameMap[x][y] === 4) {
+        newLines = newLines + figures.smiley;
       }
     }
     newLines = newLines + '\n';
@@ -164,8 +169,8 @@ function computeIt(oa, ind, rb, outarr) {
     var {inst, i1, i2, i3} = await getIndexes(oa, ind, rb);
     switch(inst) {
       case 99:
-        console.log(score);
         drawImage();
+        update("Blocks on board: " + blockCount + " blocks \nGAME OVER - FINAL SCORE: " + score + ".");
         resolve({oa: oa, ind: oa.length, rb: rb});
         break;
       case 1:
@@ -178,12 +183,11 @@ function computeIt(oa, ind, rb, outarr) {
         break; 
       case 3:
         drawImage();
-        await sleep(10);
+        //await sleep(10);
         oa[i1] = getInputVal();
         resolve({oa: oa, ind: ind+2, rb: rb});
         break;
       case 4:
-        //console.log("Outputting: ", getValue(oa, i1));
         robotVal(getValue(oa, i1));
         resolve({oa: oa, ind: ind+2, rb: rb});
         break;
@@ -239,13 +243,10 @@ async function parseArray(oa) {
 }
 
 async function main() {
-
-  var input = fs.createReadStream("input.txt");
-
+  var input = fs.createReadStream("input2.txt");
   var oa = await splitArray(input);
   oa = await convertToInt(oa);
   parseArray(oa);
-
 }
 
 main();
