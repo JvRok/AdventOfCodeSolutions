@@ -8,10 +8,16 @@ var resourcesMap = new Map();
 var countMap = new Map();
 
 countMap.set("ORE", 0);
+resourcesMap.set("ORE", 0);
 
 function splitData(data) {
   return data.toString().split(os.EOL);
 }
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 function splitNLToArray(array) {
   return new Promise(function(resolve, reject) {
@@ -43,46 +49,43 @@ function splitFuel(reactionsLine) {
 }
 
 function requirements(resource, req) {
-  if (resourcesMap.get("FUEL") === 1) {
-    console.log("hihihih");
-    return;
-  } else if (resource === "ORE") {
-    console.log("ORA ORA ORA");
-    resourcesMap.set("ORE", resourcesMap.get("ORE") + req);
-    countMap.set("ORE", countMap.get("ORE") + req);
-    requirements(resource, req);
-  } else {
-    //console.log(fuelMap.get(resource).fuel);
-    //console.log(resource);
-    console.log(resource);
-    var fuelReqList = fuelMap.get(resource).fuel;
-    console.log(fuelReqList);
-    for (var i = 0; i < fuelReqList.length; i++) {
-      if (fuelReqList[i].n > resourcesMap.get(fuelReqList[i].r)) {
-        console.log("BLAH BLAH BLAH");
-        console.log(fuelReqList[i]);
-        requirements(fuelReqList[i].r, fuelReqList[i].n);
-      } else {
-        console.log(
-          fuelReqList[i].n,
-          " as compared to ",
-          resourcesMap.get(fuelReqList[i].r)
-        );
 
-        resourcesMap.set(
-          resource,
-          resourcesMap.get(resource) + fuelMap.get(resource).product.n
-        );
-        countMap.set(
-          resource,
-          countMap.get(resource) + fuelMap.get(resource).product.n
-        );
+  //This variable is the map 
+  var reactionMap = fuelMap.get(resource);
+  var breakGate = true;
+  //console.log(resource, reactionMap);
+  if(resourcesMap.get("FUEL") === 1) {
+    return;
+  } else if (resource === "ORE" ) {
+    //console.log("In with the ore loop");
+    //Work out how much ore you need
+    var requiredOre = req - resourcesMap.get("ORE")
+    //console.log("requiredOre", requiredOre);
+    resourcesMap.set(resource, resourcesMap.get(resource) + requiredOre); 
+    countMap.set(resource, countMap.get(resource) + requiredOre);
+  } else {
+    for(var i = 0; i < reactionMap.fuel.length; i++) {
+      if(reactionMap.fuel[i].n <= resourcesMap.get(reactionMap.fuel[i].r)) {
+      } else {
+        //console.log("We didnt have enough resources for the reaction, lets recurse");
+        breakGate = false;
+        requirements(reactionMap.fuel[i].r,reactionMap.fuel[i].n);
+      }
+    }
+    if(breakGate) {
+      resourcesMap.set(resource, resourcesMap.get(resource) + reactionMap.product.n);
+      for(var i = 0; i < reactionMap.fuel.length; i++) {
+        resourcesMap.set(reactionMap.fuel[i].r, resourcesMap.get(reactionMap.fuel[i].r) - reactionMap.fuel[i].n) 
       }
     }
   }
+
+
+
+
 }
 async function main() {
-  var input = fs.createReadStream("tinput.txt");
+  var input = fs.createReadStream("input.txt");
   var splitNewLines = await splitNLToArray(input);
 
   //Sets up the map to lookup each ingredient
@@ -91,13 +94,15 @@ async function main() {
     splitFuel(reactions);
   }
   //TODO
-  for (var i = 0; i < 5; i++) {
+  while(resourcesMap.get("FUEL") < 1) {
+    //console.log(resourcesMap);
+    //console.log("#############################");
+    //await sleep(2000);
     requirements("FUEL", 1);
   }
-  //console.log(resourcesMap);
+  console.log(resourcesMap);
   //requirements("FUEL", 1);
   console.log(countMap.get("ORE"));
-  console.log(resourcesMap);
 }
 
 main();
