@@ -182,7 +182,7 @@ function doLoopUntilReturn(middleIndex) {
 }
 
 async function main() {
-  var input = fs.createReadStream("input.txt");
+  var input = fs.createReadStream("tinput.txt");
   splitNewLines = await splitNLToArray(input);
   //Sets up the map to lookup each ingredient
   for (var i = 0; i < splitNewLines.length; i++) {
@@ -203,14 +203,11 @@ async function main() {
   // Define Start and End Index
   let startIndex = 0;
   let endIndex = estFuel * 2;
-  //console.log(endIndex);
+  console.log(endIndex);
 
   while (startIndex <= endIndex) {
     let middleIndex = Math.floor((startIndex + endIndex) / 2);
     var { test, fuelNum } = doLoopUntilReturn(middleIndex);
-    if (startIndex === endIndex) {
-      console.log("Maximum Fuel is:", maxFuel);
-    }
     if (test) {
       startIndex = middleIndex + 1;
       maxFuel = fuelNum;
@@ -218,7 +215,7 @@ async function main() {
     if (!test) {
       endIndex = middleIndex - 1;
     } else {
-      /*console.log(
+      console.log(
         "Not yet found, Starting again with SI: ",
         startIndex,
         " MI: ",
@@ -226,9 +223,9 @@ async function main() {
         " EI: ",
         endIndex
       );
-      */
     }
   }
+  console.log("Maximum Fuel is:", maxFuel);
 }
 
 main();
