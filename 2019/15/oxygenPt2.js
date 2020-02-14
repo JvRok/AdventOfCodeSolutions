@@ -10,6 +10,7 @@ var line = "";
 var startPt = { x: 23, y: 23 };
 var endPt;
 var robot = { x: startPt.x, y: startPt.y, dir: 1, pdir: 0, px: 0, py: 0 };
+var bool = false;
 //init the grid matrix
 for (var i = 0; i < cols; i++) {
   gameMap[i] = [];
@@ -229,102 +230,65 @@ function paintMaze(robot) {
   console.log(line);
 }
 
-function prepareGameMap() {
+function addToCoords(x, y, coordsList) {
+  if (gameMap[x][y] !== "#" && gameMap[x][y] !== "O") {
+    bool = true;
+    coordsList.push({ x, y });
+  }
+  return coordsList;
+}
+
+function spreadOxygen() {
+  //console.log(gameMap.length);
+  var newMap = gameMap.slice(0);
+  bool = false;
+  var coordsList = [];
+  console.log("loop");
   for (var y = 0; y < gameMap.length; y++) {
     for (var x = 0; x < gameMap.length; x++) {
-      if (gameMap[x][y] === "#") {
-        gameMap[x][y] = 1;
-      } else {
-        gameMap[x][y] = 0;
+      if (gameMap[x][y] === "O") {
+        coords = addToCoords(x - 1, y, coordsList);
+        coords = addToCoords(x + 1, y, coordsList);
+        coords = addToCoords(x, y - 1, coordsList);
+        coords = addToCoords(x, y + 1, coordsList);
       }
     }
   }
-  paintMaze({ x: 25, y: 25 });
-}
-
-function findWay(position, end) {
-  var queue = [];
-  var validpaths = [];
-
-  // New points, where we did not check the surroundings:
-  // remember the position and how we got there
-  // initially our starting point and a path containing only this point
-  queue.push({ pos: position, path: [position] });
-
-  // as long as we have unchecked points
-  while (queue.length > 0) {
-    // get next position to check viable directions
-    var obj = queue.shift();
-    var pos = obj.pos;
-    var path = obj.path;
-
-    // all points in each direction
-    var direction = [
-      [pos[0] + 1, pos[1]],
-      [pos[0], pos[1] + 1],
-      [pos[0] - 1, pos[1]],
-      [pos[0], pos[1] - 1]
-    ];
-
-    for (var i = 0; i < direction.length; i++) {
-      // check if out of bounds or in a "wall"
-      if (direction[i][0] < 0 || direction[i][0] >= gameMap[0].length) continue;
-      if (direction[i][1] < 0 || direction[i][1] >= gameMap[0].length) continue;
-      if (gameMap[direction[i][0]][direction[i][1]] != 0) continue;
-
-      // check if we were at this point with this path already:
-      var visited = false;
-      for (var j = 0; j < path.length; j++) {
-        if (path[j][0] == direction[i][0] && path[j][1] == direction[i][1]) {
-          visited = true;
-          break;
-        }
-      }
-      if (visited) continue;
-
-      // copy path
-      var newpath = path.slice(0);
-      // add new point
-      newpath.push(direction[i]);
-
-      // check if we are at end
-      if (direction[i][0] != end[0] || direction[i][1] != end[1]) {
-        // remember position and the path to it
-        queue.push({ pos: direction[i], path: newpath });
-      } else {
-        // remember this path from start to end
-        validpaths.push(newpath);
-        // break here if you want only one shortest path
-      }
-    }
+  console.log(coordsList);
+  for (var c = 0; c < coordsList.length; c++) {
+    gameMap[coordsList[c].x][coordsList[c].y] = "O";
   }
-  return validpaths;
+  if (!bool) {
+    console.log("newmap === gameMap");
+    return false;
+  } else {
+    console.log("newmap !== gameMap");
+    gameMap = newMap.slice(0);
+    return true;
+  }
 }
 
-function getBFSPath(startPt, endPt, gameMap) {
-  prepareGameMap(gameMap);
-
-  console.log(startPt, endPt);
-  var start = [startPt.x, startPt.y];
-  var end = [endPt.x, endPt.y];
-
-  var path = findWay(start, end);
-  console.log("Maze Length is: ", path[0].length - 1);
-}
-
-function computeIt(oa, ind, rb, outarr) {
+async function computeIt(oa, ind, rb, outarr) {
   return new Promise(async function(resolve, reject) {
     var { inst, i1, i2, i3 } = await getIndexes(oa, ind, rb);
     if (!solved) {
       switch (inst) {
         case 99:
-          //drawImage();
           console.log("99 code");
           resolve({ oa: oa, ind: oa.length, rb: rb });
-          //paintMaze(robot);
-          //robot.x = startPt.x;
-          //robot.y = startPt.y;
-          getBFSPath(startPt, endPt, gameMap);
+          var loop = true;
+          var minute = 0;
+          while (loop) {
+            //await sleep(500);
+            if (!spreadOxygen()) {
+              loop = false;
+            } else {
+              minute++;
+              paintMaze(robot);
+              console.log(minute);
+            }
+          }
+          console.log(minute);
           break;
         case 1:
           oa[i3] = getValue(oa, i1) + getValue(oa, i2);
@@ -411,7 +375,7 @@ async function main() {
   var input = fs.createReadStream("input.txt");
   var oa = await splitArray(input);
   oa = await convertToInt(oa);
-  paintMaze(robot);
+  //paintMaze(robot);
   parseArray(oa);
 }
 
