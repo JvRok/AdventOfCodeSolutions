@@ -25,42 +25,53 @@ var entry = [
   67,
   10,
   76,
+  44,
   49,
   48,
   44,
   76,
+  44,
   49,
   50,
   44,
   82,
+  44,
   54,
   10,
   82,
+  44,
   49,
   48,
   44,
   76,
+  44,
   52,
   44,
   76,
+  44,
   52,
   44,
   76,
+  44,
   49,
   50,
   10,
   76,
+  44,
   49,
   48,
   44,
   82,
+  44,
   49,
   48,
   44,
   82,
+  44,
   54,
   44,
   76,
+  44,
   52,
   10,
   110,
@@ -188,12 +199,8 @@ function calcInter() {
 }
 
 function buildCoords(output) {
-  //console.log(sM);
-
   var sMyl = sM.length - 1;
   var sMxl = sM[sMyl].length;
-  //console.log("x: ", sMxl, " y: ", sMyl);
-  //console.log("Next output is: ", output);
   if (output === 10) {
     sM[sMyl + 1] = [];
   } else {
@@ -216,7 +223,6 @@ function buildCoords(output) {
 }
 
 function turnRobot() {
-  //console.log(robot.y, robot.x);
   if (robot.dir === "N") {
     if (sM[robot.y][robot.x - 1] === "#") {
       robot.dir = "W";
@@ -263,15 +269,9 @@ function turnRobot() {
 
 function makeUncompPath() {
   var path = turnRobot();
-  console.log("path: ", path);
-  console.log(robot.dir);
-  //console.log(robot);
   var bounds = { y: sM.length - 2, x: sM[0].length };
-  console.log(bounds);
   var deadEnd = false;
   while (!deadEnd) {
-    //console.log("path: ", path);
-
     var timeToTurn = false;
     var currentLength = 0;
     while (!timeToTurn) {
@@ -318,24 +318,12 @@ function makeUncompPath() {
           }
         }
       } else if (robot.dir === "W") {
-        //console.log(robot.dir);
-        console.log(
-          "currentSquare",
-          sM[robot.y][robot.x],
-          " at X: ",
-          robot.x,
-          " Y: ",
-          robot.y
-        );
-        console.log("Robot moving to: ", sM[robot.y][robot.x - 1]);
-
         if (robot.x > 0 && sM[robot.y][robot.x - 1] === "#") {
           robot.x = robot.x - 1;
           currentLength++;
         } else {
           var turnRobotRes = turnRobot();
           timeToTurn = true;
-          //console.log(turnRobotRes);
           if (turnRobotRes !== "D") {
             path = path + currentLength + "," + turnRobotRes;
           } else {
@@ -346,7 +334,6 @@ function makeUncompPath() {
       }
     }
   }
-  console.log(path);
 }
 
 function enterLine() {
@@ -359,8 +346,8 @@ async function computeIt(oa, ind, rb, outarr) {
     if (!solved) {
       switch (inst) {
         case 99:
-          console.log("99 code");
           console.log(record);
+          console.log("99 code");
           resolve({ oa: oa, ind: oa.length, rb: rb });
           //paintSM();
           //console.log(calcInter());
@@ -376,14 +363,11 @@ async function computeIt(oa, ind, rb, outarr) {
           break;
         case 3:
           await sleep(50);
-          console.log("uh oh, it wants input");
           oa[i1] = enterLine();
           resolve({ oa: oa, ind: ind + 2, rb: rb });
           break;
         case 4:
-          //paintSM();
-          //await sleep(20);
-          console.log(getValue(oa, i1));
+          record = getValue(oa, i1);
           resolve({ oa: oa, ind: ind + 2, rb: rb });
           break;
         case 5:
