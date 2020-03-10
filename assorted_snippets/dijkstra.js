@@ -67,7 +67,7 @@ function parsePathToCoordinateArray(path) {
       x: parseInt(pathCoords[i][0])
     };
   }
-  console.log(pathCoords);
+  //console.log(pathCoords);
   return pathCoords;
 }
 
@@ -78,8 +78,8 @@ function drawMaze(maze, path) {
     var x = coordArray[i].x;
     var y = coordArray[i].y;
 
-    mazeArray[y] = mazeArray[y].slice(0, x) + "*" + mazeArray[y].slice(x + 1);
-    console.log(mazeArray[y][x]);
+    mazeArray[y] = mazeArray[y].slice(0, x) + "O" + mazeArray[y].slice(x + 1);
+    //console.log(mazeArray[y][x]);
   }
   console.log(mazeArray);
 }
@@ -88,7 +88,7 @@ async function main() {
   graph = await mc.getGraph;
   maze = await mc.getMaze;
   var finishCoord = getFinishCoord();
-  console.log(finishCoord);
+  //console.log(finishCoord);
   //console.log(graph);
 
   var la = getLowestAvailVal();

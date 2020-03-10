@@ -74,13 +74,13 @@ function convertMazeObjectToGraph(mazeObject) {
 }
 
 async function getMaze() {
-  var input = fs.createReadStream("input.txt");
+  var input = fs.createReadStream("bigInput.txt");
   var mazeObject = await splitArray(input);
   return mazeObject;
 }
 
 async function getGraph() {
-  var input = fs.createReadStream("input.txt");
+  var input = fs.createReadStream("bigInput.txt");
   var mazeObject = await splitArray(input);
   var mazeGraph = await convertMazeObjectToGraph(mazeObject);
   return mazeGraph;
