@@ -1,0 +1,17 @@
+{
+  "name": "aoc_2018",
+  "version": "1.0.0",
+  "description": "Advent of Code puzzles",
+  "main": "fuelCalc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "draftlog": "^1.0.12",
+    "figures": "^3.1.0",
+    "mathjs": "^11.4.0",
+    "multikeymap": "^1.0.0"
+  }
+}

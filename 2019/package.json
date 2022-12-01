@@ -1,5 +1,5 @@
 {
-  "name": "aoc",
+  "name": "aoc_2019",
   "version": "1.0.0",
   "description": "Advent of Code puzzles",
   "main": "fuelCalc.js",
@@ -11,7 +11,7 @@
   "dependencies": {
     "draftlog": "^1.0.12",
     "figures": "^3.1.0",
-    "mathjs": "^7.5.1",
+    "mathjs": "^11.4.0",
     "multikeymap": "^1.0.0"
   }
 }
