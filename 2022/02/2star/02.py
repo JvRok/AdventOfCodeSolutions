@@ -14,10 +14,6 @@ rps = {
 with open(os.path.join(os.getcwd(), 'input'), 'r') as input:
   for line in input:
     if line != '\n':
-      score += rps[line[2]]
-      match (rps[line[2]] - rps[line[0]] + 3) % 3:
-        case 0:
-          score += 3
-        case 1:
-          score += 6
+      score += (rps[line[2]] - 1) * 3 #Score for d/w/l
+      score += list(rps.values())[(rps[line[0]] + rps[line[2]] + 3) % 3]
 print(score)
