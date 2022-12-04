@@ -15,5 +15,5 @@ with open(os.path.join(os.getcwd(), 'input'), 'r') as input:
   for line in input:
     if line != '\n':
       score += (rps[line[2]] - 1) * 3 #Score for d/w/l
-      score += list(rps.values())[(rps[line[0]] + rps[line[2]] + 3) % 3]
+      score += list(rps.values())[(rps[line[0]] + rps[line[2]]) % 3]
 print(score)
